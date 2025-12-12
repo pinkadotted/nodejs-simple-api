@@ -25,7 +25,18 @@ app.get('/time', (req, res) => {
 app.get('/btc', async (req, res) => {
   try {
     const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=sgd');
+    
+    if (!response.ok) {
+      throw new Error(`API request failed with status: ${response.status}`);
+    }
+    
     const data = await response.json();
+    console.log('API Response:', JSON.stringify(data));
+    
+    if (!data || !data.bitcoin || typeof data.bitcoin.sgd === 'undefined') {
+      throw new Error('Invalid API response structure');
+    }
+    
     const btcPrice = data.bitcoin.sgd;
     res.send(`Bitcoin price: S$${btcPrice.toLocaleString()}`);
   } catch (error) {
